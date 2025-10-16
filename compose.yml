@@ -6,7 +6,7 @@ services:
     ports:
       - "8001:8001"
     env_file:
-      - .env
+      - ./hakaton_back/.env
     volumes:
       - ./chroma_vtb:/app/chroma_vtb
       - ./hakaton_back/_smart_support_vtb_belarus_faq_final.xlsx:/app/_smart_support_vtb_belarus_faq_final.xlsx:ro
@@ -22,11 +22,11 @@ services:
       context: ./hakaton_front
       dockerfile: Dockerfile
     ports:
-      - "5173:8080"
+      - "8080:5173"
     volumes:
       - ./hakaton_front:/app
       - /app/node_modules
     env_file:
-      - .env
+      - ./hakaton_front/.env
     depends_on:
       - backend
