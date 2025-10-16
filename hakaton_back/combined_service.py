@@ -64,6 +64,14 @@ class CreateMessage(BaseModel):
     message: str
 
 
+class MatchedRequest(BaseModel):
+    question: str
+    primary: str
+    sideRecommendations: List[str]
+    answer: str
+    matched: bool
+
+
 class BackendMessage(BaseModel):
     id: str
     userId: str
@@ -1138,4 +1146,59 @@ async def test_search():
     except Exception as e:
         logger.error(f"Test search failed: {e}")
         raise HTTPException(status_code=500, detail=f"Test search failed: {str(e)}")
+
+
+@app.post("/api/matched-feedback")
+async def handle_matched_feedback(request: MatchedRequest):
+    """
+    Endpoint to handle matched feedback from the frontend.
+    If matched is true, saves to good.json, otherwise to bad.json.
+    """
+    import json
+    from datetime import datetime
+    
+    # Prepare the data to save
+    feedback_data = {
+        "question": request.question,
+        "primary": request.primary,
+        "sideRecommendations": request.sideRecommendations,
+        "answer": request.answer,
+        "matched": request.matched,
+        "timestamp": datetime.now().isoformat()
+    }
+    
+    try:
+        if request.matched:
+            # Write to good.json
+            try:
+                with open("good.json", "r", encoding="utf-8") as f:
+                    good_data = json.load(f)
+            except FileNotFoundError:
+                good_data = []
+            
+            good_data.append(feedback_data)
+            
+            with open("good.json", "w", encoding="utf-8") as f:
+                json.dump(good_data, f, ensure_ascii=False, indent=2)
+                
+            logger.info(f"Saved matched=True feedback to good.json: {request.question}")
+        else:
+            # Write to bad.json
+            try:
+                with open("bad.json", "r", encoding="utf-8") as f:
+                    bad_data = json.load(f)
+            except FileNotFoundError:
+                bad_data = []
+            
+            bad_data.append(feedback_data)
+            
+            with open("bad.json", "w", encoding="utf-8") as f:
+                json.dump(bad_data, f, ensure_ascii=False, indent=2)
+                
+            logger.info(f"Saved matched=False feedback to bad.json: {request.question}")
+        
+        return {"status": "success", "message": "Feedback saved successfully"}
+    except Exception as e:
+        logger.error(f"Failed to save feedback: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to save feedback: {str(e)}")
     
