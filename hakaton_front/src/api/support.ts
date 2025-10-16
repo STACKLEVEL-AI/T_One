@@ -1,6 +1,6 @@
 import type { SupportMessage, SupportReply } from '../types';
 
-const API_URL = import.meta.env.VITE_SUPPORT_API_URL ?? 'http://localhost:8000/api';
+const API_URL = import.meta.env.VITE_SUPPORT_API_URL ?? 'http://localhost:8001/api';
 
 // ---------- Backend contracts ----------
 type BackendMessage = {
