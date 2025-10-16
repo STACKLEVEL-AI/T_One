@@ -1148,7 +1148,7 @@ async def test_search():
         raise HTTPException(status_code=500, detail=f"Test search failed: {str(e)}")
 
 
-@app.post("/api/matched-feedback")
+@app.post("/api/dataset")
 async def handle_matched_feedback(request: MatchedRequest):
     """
     Endpoint to handle matched feedback from the frontend.
@@ -1172,7 +1172,11 @@ async def handle_matched_feedback(request: MatchedRequest):
             # Write to good.json
             try:
                 with open("good.json", "r", encoding="utf-8") as f:
-                    good_data = json.load(f)
+                    content = f.read()
+                    if content.strip():  # Check if file is not empty
+                        good_data = json.loads(content)
+                    else:
+                        good_data = []
             except FileNotFoundError:
                 good_data = []
             
@@ -1186,7 +1190,11 @@ async def handle_matched_feedback(request: MatchedRequest):
             # Write to bad.json
             try:
                 with open("bad.json", "r", encoding="utf-8") as f:
-                    bad_data = json.load(f)
+                    content = f.read()
+                    if content.strip():  # Check if file is not empty
+                        bad_data = json.loads(content)
+                    else:
+                        bad_data = []
             except FileNotFoundError:
                 bad_data = []
             
