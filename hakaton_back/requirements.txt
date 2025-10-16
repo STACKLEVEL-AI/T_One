@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+httpx
+pydantic
+openai
+pandas
+chromadb
+python-dotenv
+openpyxl

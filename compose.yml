@@ -1,0 +1,32 @@
+services:
+  backend:
+    build:
+      context: ./hakaton_back
+      dockerfile: dockerfile
+    ports:
+      - "8001:8001"
+    env_file:
+      - .env
+    volumes:
+      - ./chroma_vtb:/app/chroma_vtb
+      - ./hakaton_back/_smart_support_vtb_belarus_faq_final.xlsx:/app/_smart_support_vtb_belarus_faq_final.xlsx:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s  # Даем больше времени на начальную загрузку
+
+  frontend:
+    build:
+      context: ./hakaton_front
+      dockerfile: Dockerfile
+    ports:
+      - "5173:8080"
+    volumes:
+      - ./hakaton_front:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    depends_on:
+      - backend
